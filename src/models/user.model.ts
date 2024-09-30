@@ -23,6 +23,12 @@ class User {
       },
     });
   }
+
+  static createUser(user: Object) {
+    return prisma.users.create({
+      data: user,
+    });
+  }
 }
 
 module.exports = User;
