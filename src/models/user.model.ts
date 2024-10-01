@@ -5,11 +5,11 @@ const prisma = new PrismaClient();
 
 class User {
   static fetchAll() {
-    return prisma.users.findMany();
+    return prisma.user.findMany();
   }
 
   static findByUsername(username: String) {
-    return prisma.users.findUnique({
+    return prisma.user.findUnique({
       where: {
         username: username,
       },
@@ -17,7 +17,7 @@ class User {
   }
 
   static findByEmail(email: String) {
-    return prisma.users.findUnique({
+    return prisma.user.findUnique({
       where: {
         email: email,
       },
@@ -25,7 +25,7 @@ class User {
   }
 
   static createUser(user: Object) {
-    return prisma.users.create({
+    return prisma.user.create({
       data: user,
     });
   }
