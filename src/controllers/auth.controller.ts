@@ -12,12 +12,8 @@ class AuthController {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { username, password } = req.body;
-      if (!username || !password) {
-        res.status(400).json({ error: "Username and password are required" });
-        return;
-      }
 
-      const user = await User.findByUsername(username);
+      const user = await User.findByUsername(username.toLowerCase());
       if (user === null) {
         res.status(401).json({ error: "User not found" });
         return;
@@ -47,33 +43,18 @@ class AuthController {
     }
   }
 
+  // [POST] /api/auth/register
   async register(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, username, email, password } = req.body;
-      if (!name || !username || !email || !password) {
-        res.status(400).json({ error: "All fields are required" });
-        return;
-      }
-
-      const emailExist = await User.findByEmail(email);
-      if (emailExist !== null) {
-        res.status(400).json({ error: "Email already exists" });
-        return;
-      }
-
-      const userExist = await User.findByUsername(username);
-      if (userExist !== null) {
-        res.status(400).json({ error: "Username already exists" });
-        return;
-      }
 
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(password, salt);
 
       const newUser = await User.createUser({
         name: name,
-        username: username,
-        email: email,
+        username: username.toLowerCase(),
+        email: email.toLowerCase(),
         password: hash,
       });
 
