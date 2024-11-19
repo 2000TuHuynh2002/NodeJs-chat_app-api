@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { RedisClient } from "../config/redis.conf";
+import { RedisClient } from "../configs/redis.conf";
 
 require("dotenv").config();
 

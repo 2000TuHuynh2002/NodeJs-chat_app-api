@@ -5,7 +5,11 @@
   "main": "src/app.ts",
   "scripts": {
     "dev": "nodemon src/app.ts",
-    "prod": "npx ts-node --transpile-only src/app.ts"
+    "prod": "npx ts-node --transpile-only src/app.ts",
+    "prisma:generate": "prisma generate --schema src/prisma/schema.prisma",
+    "prisma:migrate": "prisma db push --schema src/prisma/schema.prisma",
+    "prisma:seed": "ts-node src/prisma/seed.ts",
+    "prisma:format": "prisma format --schema src/prisma/schema.prisma"
   },
   "author": "tuhuynh",
   "license": "ISC",
