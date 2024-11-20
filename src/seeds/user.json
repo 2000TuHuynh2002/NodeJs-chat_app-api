@@ -1,0 +1,35 @@
+[
+  {
+    "email": "admin@local",
+    "username": "admin",
+    "password": "$2b$12$H1Oro1B8457DO/73zl1mUebosAtTeBHtuCzyls3YIq9b.n74a7rf2",
+    "firstName": "Admin",
+    "lastName": "Local",
+    "dayOfBirth": 980985600,
+    "phoneNumber": "0999999999",
+    "roles": ["ADMIN"],
+    "blockBy": []
+  },
+  {
+    "email": "user01@local",
+    "username": "user01",
+    "password": "$2b$12$ob6OpCIFa4GR32SRQ2iz1OfEsD9l2qZDI/WXAZyA4BTgUm7M7pMra",
+    "firstName": "User",
+    "lastName": "01",
+    "dayOfBirth": 1010016000,
+    "phoneNumber": "0111111111",
+    "roles": ["USER"],
+    "blockBy": []
+  },
+  {
+    "email": "user02@local",
+    "username": "user02",
+    "password": "$2b$12$SZlCQFfqfQxr9mt8nQbU.ew9UXx9ZotwoDWXvU.1U3Zil5k8BBSwa",
+    "firstName": "User",
+    "lastName": "02",
+    "dayOfBirth": 951004800,
+    "phoneNumber": "0222222222",
+    "roles": ["USER"],
+    "blockBy": []
+  }
+]
