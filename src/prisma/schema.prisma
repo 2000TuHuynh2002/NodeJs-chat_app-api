@@ -10,7 +10,23 @@ datasource db {
 model user {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   email    String @unique(map: "email_1")
-  name     String
-  password String
   username String @unique(map: "username_1")
+  password String
+
+  roles     Role[]   @default([USER])
+  blockedBy String[] @default([])
+
+  firstName   String?
+  lastName    String?
+  dayOfBirth  Int?
+  phoneNumber String? @unique(map: "phoneNumber_1")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  MODERATOR
+  USER
 }
