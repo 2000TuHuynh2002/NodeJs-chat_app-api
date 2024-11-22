@@ -13,7 +13,9 @@ const registerMiddlewaresList = [
   RegisterMiddleware.checkDuplication,
 ];
 
-router.get("/login", LoginMiddleware.checkNull, AuthController.login);
+router.post("/login", LoginMiddleware.checkNull, AuthController.login);
 router.post("/register", registerMiddlewaresList, AuthController.register);
+router.post("/refreshToken", AuthController.refreshToken);
+router.post("/logout", AuthController.logout);
 
 module.exports = router;

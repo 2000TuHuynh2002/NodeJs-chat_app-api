@@ -20,7 +20,7 @@ class RedisClient {
     }
   }
 
-  public async set(key: string, value: string) {
+  public async set(key: string, value: string | JSON) {
     await this.client.set(key, value);
   }
 
@@ -30,6 +30,22 @@ class RedisClient {
 
   public async del(key: string) {
     await this.client.del(key);
+  }
+
+  public async hSet(key: string, field: string, value: string | JSON) {
+    await this.client.hSet(key, field, value);
+  }
+
+  public async hGet(key: string, field: string) {
+    return await this.client.hGet(key, field);
+  }
+
+  public async hExpire(key: string, field: string, seconds: number) {
+    await this.client.hExpire(key, field, seconds);
+  }
+
+  public async hDel(key: string, field: string) {
+    await this.client.hDel(key, field);
   }
 
   public async close() {
