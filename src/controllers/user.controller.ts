@@ -22,7 +22,7 @@ class UserController {
   // [GET] /api/user/username/{username}
   async getUserByUsername(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await User.findByUsername(req.params.username);
+      const user = await User.findByUsername(req.query.value);
       if (user === null) {
         res.status(404).json({ message: "User not found" });
         return;
@@ -30,7 +30,7 @@ class UserController {
       res.status(200).json({ result: user });
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "not valid" });
       }
     }
   }
@@ -38,7 +38,7 @@ class UserController {
   // [GET] /api/user/email/{email}
   async getUserByEmail(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await User.findByEmail(req.params.email);
+      const user = await User.findByEmail(req.query.value);
       if (user === null) {
         res.status(404).json({ message: "User not found" });
         return;
@@ -46,7 +46,7 @@ class UserController {
       res.status(200).json({ result: user });
     } catch (error: any) {
       if (error instanceof Error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "not valid" });
       }
     }
   }
