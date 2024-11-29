@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import AuthTokenHelper from "../utils/auth-token";
+import { convertToSecond } from "../utils/base-unixTime";
 
 require("dotenv").config();
 
@@ -20,6 +21,7 @@ class AuthController {
       const { username, password } = req.body;
 
       const user = await User.findByUsername(username.toLowerCase());
+
       if (user === null) {
         res.status(401).json({ error: "User not found" });
         return;
@@ -41,19 +43,29 @@ class AuthController {
 
       await AuthTokenHelper.storeToken(user.id, refreshToken);
 
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: convertToSecond(refreshExpiresIn) * 1000,
+      });
+
+      res.cookie("isLoggedIn", true, {
+        httpOnly: false,
+        secure: true,
+        sameSite: "none",
+        maxAge: convertToSecond(refreshExpiresIn) * 1000,
+      });
+
       res.status(200).json({
-        status: "200",
         message: "Login Successfully",
-        data: {
+        user: {
           _id: user.id,
-          user: user.name,
+          username: user.name,
           email: user.email,
-          token: {
-            type: "Bearer",
-            refresh_token: refreshToken,
-            access_token: accessToken,
-          },
+          roles: user.roles,
         },
+        accessToken: accessToken,
       });
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
@@ -83,6 +95,7 @@ class AuthController {
           user: newUser.name,
           username: newUser.username,
           email: newUser.email,
+          roles: newUser.roles,
         },
       });
     } catch (err: any) {
@@ -93,7 +106,7 @@ class AuthController {
   // [POST] /api/auth/refresh
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const { refreshToken } = req.body;
+      const { refreshToken } = req.cookies || {};
 
       if (!refreshToken) {
         return res.status(401).json({ error: "Refresh token is required" });
@@ -121,15 +134,23 @@ class AuthController {
 
       await AuthTokenHelper.storeToken(userId, newRefreshToken);
 
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: convertToSecond(refreshExpiresIn) * 1000,
+      });
+
+      res.cookie("isLoggedIn", true, {
+        httpOnly: false,
+        secure: true,
+        sameSite: "none",
+        maxAge: convertToSecond(refreshExpiresIn) * 1000,
+      });
+
       res.status(200).json({
-        status: "200",
         message: "Token refreshed successfully",
-        data: {
-          token: {
-            refresh_token: newRefreshToken,
-            access_token: newAccessToken,
-          },
-        },
+        accessToken: newAccessToken,
       });
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
@@ -139,8 +160,7 @@ class AuthController {
   // [POST] /api/auth/logout
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      const { refreshToken } = req.body;
-
+      const { refreshToken } = req.cookies || {};
       if (!refreshToken) {
         return res.status(400).json({ error: "Token is required" });
       }
@@ -156,6 +176,9 @@ class AuthController {
       if (!isTokenExist) {
         return res.status(401).json({ error: "Refesh token is invalid" });
       }
+
+      res.clearCookie("refreshToken");
+      res.clearCookie("isLoggedIn");
 
       await AuthTokenHelper.revokeToken(userId, refreshToken);
 
