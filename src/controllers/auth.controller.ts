@@ -115,6 +115,8 @@ class AuthController {
       const decoded = jwt.verify(refreshToken, refreshSecretKey) as JwtPayload;
       const userId = decoded._id;
 
+      const user = await User.findById(userId);
+
       const isTokenExist = await AuthTokenHelper.isTokenExist(
         userId,
         refreshToken
@@ -150,6 +152,12 @@ class AuthController {
 
       res.status(200).json({
         message: "Token refreshed successfully",
+        user: {
+          _id: user.id,
+          username: user.name,
+          email: user.email,
+          roles: user.roles,
+        },
         accessToken: newAccessToken,
       });
     } catch (err: any) {
