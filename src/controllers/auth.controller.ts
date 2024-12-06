@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import AuthTokenHelper from "../utils/auth-token";
-import { convertToSecond } from "../utils/base-unixTime";
+import { unixTimeNow, convertToSecond } from "../utils/base-unixTime";
 
 require("dotenv").config();
 
@@ -61,11 +61,14 @@ class AuthController {
         message: "Login Successfully",
         user: {
           _id: user.id,
-          username: user.name,
+          username: user.username,
           email: user.email,
           roles: user.roles,
         },
-        accessToken: accessToken,
+        accessToken: {
+          token: accessToken,
+          expiredAt: unixTimeNow() + convertToSecond(accessExpiresIn),
+        },
       });
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
@@ -92,7 +95,6 @@ class AuthController {
         message: "User created successfully",
         data: {
           _id: newUser.id,
-          user: newUser.name,
           username: newUser.username,
           email: newUser.email,
           roles: newUser.roles,
@@ -103,7 +105,7 @@ class AuthController {
     }
   }
 
-  // [POST] /api/auth/refresh
+  // [POST] /api/auth/refreshToken
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
       const { refreshToken } = req.cookies || {};
@@ -154,14 +156,18 @@ class AuthController {
         message: "Token refreshed successfully",
         user: {
           _id: user.id,
-          username: user.name,
+          username: user.username,
           email: user.email,
           roles: user.roles,
         },
-        accessToken: newAccessToken,
+        accessToken: {
+          token: newAccessToken,
+          expiredAt: unixTimeNow() + convertToSecond(accessExpiresIn),
+        },
       });
     } catch (err: any) {
-      res.status(500).json({ status: "error", message: err.message });
+      console.log(err);
+      res.status(500).json({ error: err.message });
     }
   }
 

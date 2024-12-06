@@ -8,6 +8,14 @@ class User {
     return prisma.user.findMany();
   }
 
+  static findById(id: Number) {
+    return prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  }
+  
   static findByUsername(username: String) {
     return prisma.user.findUnique({
       where: {
