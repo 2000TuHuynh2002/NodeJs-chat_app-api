@@ -62,6 +62,8 @@ class AuthController {
         user: {
           _id: user.id,
           username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           roles: user.roles,
         },
@@ -96,6 +98,8 @@ class AuthController {
         data: {
           _id: newUser.id,
           username: newUser.username,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
           email: newUser.email,
           roles: newUser.roles,
         },
@@ -157,6 +161,8 @@ class AuthController {
         user: {
           _id: user.id,
           username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           roles: user.roles,
         },
