@@ -3,7 +3,7 @@ require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-class User {
+class UserModel {
   static fetchAll() {
     return prisma.user.findMany();
   }
@@ -39,4 +39,4 @@ class User {
   }
 }
 
-module.exports = User;
+module.exports = UserModel;

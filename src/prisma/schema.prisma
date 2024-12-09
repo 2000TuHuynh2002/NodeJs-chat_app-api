@@ -24,6 +24,9 @@ model user {
   userFriends       friend[] @relation(name: "users")
   friendUserFriends friend[] @relation(name: "friend_users")
 
+  senderId   message[] @relation(name: "sentMessages")
+  receiverId message[] @relation(name: "receivedMessages")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -39,6 +42,21 @@ model friend {
   updatedAt    DateTime @updatedAt
 
   @@unique([userId, friendUserId])
+}
+
+model message {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  senderName String
+  receiverId String   @db.ObjectId
+  text       String   @default("")
+  image      String   @default("")
+  status     String   @default("unseen")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sender   user @relation(name: "sentMessages", fields: [senderId], references: [id])
+  receiver user @relation(name: "receivedMessages", fields: [receiverId], references: [id])
 }
 
 enum Role {

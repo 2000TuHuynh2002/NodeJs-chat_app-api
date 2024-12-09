@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import validator from "validator";
 
-const User = require("../models/user.model");
+const UserModel = require("../models/user.model");
 
 class RegisterMiddleware {
   async checkNull(req: Request, res: Response, next: NextFunction) {
@@ -73,12 +73,12 @@ class RegisterMiddleware {
     const { email, username } = req.body;
     let errors = [];
 
-    const emailExist = await User.findByEmail(email.toLowerCase());
+    const emailExist = await UserModel.findByEmail(email.toLowerCase());
     if (emailExist !== null) {
       errors.push("Email already exists");
     }
 
-    const userExist = await User.findByUsername(username.toLowerCase());
+    const userExist = await UserModel.findByUsername(username.toLowerCase());
     if (userExist !== null) {
       errors.push("Username already exists");
     }

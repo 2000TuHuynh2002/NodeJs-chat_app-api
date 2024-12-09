@@ -12,7 +12,7 @@ const accessExpiresIn = process.env.JWT_EXPIRES_IN || "15m";
 const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY || "secret";
 const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
-const User = require("../models/user.model");
+const UserModel = require("../models/user.model");
 
 class AuthController {
   // [POST] /api/auth/login
@@ -20,7 +20,7 @@ class AuthController {
     try {
       const { username, password } = req.body;
 
-      const user = await User.findByUsername(username.toLowerCase());
+      const user = await UserModel.findByUsername(username.toLowerCase());
 
       if (user === null) {
         res.status(401).json({ error: "User not found" });
@@ -85,7 +85,7 @@ class AuthController {
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(password, salt);
 
-      const newUser = await User.createUser({
+      const newUser = await UserModel.createUser({
         name: name,
         username: username.toLowerCase(),
         email: email.toLowerCase(),
@@ -121,7 +121,7 @@ class AuthController {
       const decoded = jwt.verify(refreshToken, refreshSecretKey) as JwtPayload;
       const userId = decoded._id;
 
-      const user = await User.findById(userId);
+      const user = await UserModel.findById(userId);
 
       const isTokenExist = await AuthTokenHelper.isTokenExist(
         userId,
