@@ -21,8 +21,24 @@ model user {
   dayOfBirth  Int?
   phoneNumber String? @unique(map: "phoneNumber_1")
 
+  userFriends       friend[] @relation(name: "users")
+  friendUserFriends friend[] @relation(name: "friend_users")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model friend {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  friendUserId String   @db.ObjectId
+  user         user     @relation(name: "users", fields: [userId], references: [id])
+  friend       user     @relation(name: "friend_users", fields: [friendUserId], references: [id])
+  status       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, friendUserId])
 }
 
 enum Role {
