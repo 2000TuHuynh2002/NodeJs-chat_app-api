@@ -2,8 +2,9 @@ import bcrypt from "bcrypt";
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-import AuthTokenHelper from "../utils/auth-token";
+import { UserModel as User } from "../models/user.model";
 import { unixTimeNow, convertToSecond } from "../utils/base-unixTime";
+import AuthTokenHelper from "../utils/auth-token";
 
 require("dotenv").config();
 
@@ -12,15 +13,13 @@ const accessExpiresIn = process.env.JWT_EXPIRES_IN || "15m";
 const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY || "secret";
 const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
-const UserModel = require("../models/user.model");
-
 class AuthController {
   // [POST] /api/auth/login
-  async login(req: Request, res: Response, next: NextFunction) {
+  static login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { username, password } = req.body;
 
-      const user = await UserModel.findByUsername(username.toLowerCase());
+      const user = await User.findByUsername(username.toLowerCase());
 
       if (user === null) {
         res.status(401).json({ error: "User not found" });
@@ -75,18 +74,19 @@ class AuthController {
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
     }
-  }
+  };
 
   // [POST] /api/auth/register
-  async register(req: Request, res: Response, next: NextFunction) {
+  static register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, username, email, password } = req.body;
+      const { username, email, password, firstName, lastName } = req.body;
 
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(password, salt);
 
-      const newUser = await UserModel.createUser({
-        name: name,
+      const newUser = await User.createUser({
+        firstName: firstName,
+        lastName: lastName,
         username: username.toLowerCase(),
         email: email.toLowerCase(),
         password: hash,
@@ -107,10 +107,10 @@ class AuthController {
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
     }
-  }
+  };
 
   // [POST] /api/auth/refreshToken
-  async refreshToken(req: Request, res: Response, next: NextFunction) {
+  static refresh = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { refreshToken } = req.cookies || {};
 
@@ -121,7 +121,11 @@ class AuthController {
       const decoded = jwt.verify(refreshToken, refreshSecretKey) as JwtPayload;
       const userId = decoded._id;
 
-      const user = await UserModel.findById(userId);
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
 
       const isTokenExist = await AuthTokenHelper.isTokenExist(
         userId,
@@ -175,10 +179,10 @@ class AuthController {
       console.log(err);
       res.status(500).json({ error: err.message });
     }
-  }
+  };
 
   // [POST] /api/auth/logout
-  async logout(req: Request, res: Response, next: NextFunction) {
+  static logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { refreshToken } = req.cookies || {};
       if (!refreshToken) {
@@ -209,7 +213,7 @@ class AuthController {
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
     }
-  }
+  };
 }
 
-module.exports = new AuthController();
+export { AuthController };

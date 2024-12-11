@@ -1,11 +1,10 @@
 import express from "express";
 
-const AuthController = require("../controllers/auth.controller");
+import { LoginMiddleware } from "../middlewares/login.middleware";
+import { RegisterMiddleware } from "../middlewares/register.middleware";
+import { AuthController } from "../controllers/auth.controller";
 
-const LoginMiddleware = require("../middlewares/login.middleware");
-const RegisterMiddleware = require("../middlewares/register.middleware");
-
-const router = express.Router();
+const authRouter = express.Router();
 
 const registerMiddlewaresList = [
   RegisterMiddleware.checkNull,
@@ -13,9 +12,9 @@ const registerMiddlewaresList = [
   RegisterMiddleware.checkDuplication,
 ];
 
-router.post("/login", LoginMiddleware.checkNull, AuthController.login);
-router.post("/register", registerMiddlewaresList, AuthController.register);
-router.post("/refreshToken", AuthController.refreshToken);
-router.post("/logout", AuthController.logout);
+authRouter.post("/login", LoginMiddleware.checkNull, AuthController.login);
+authRouter.post("/register", registerMiddlewaresList, AuthController.register);
+authRouter.post("/refreshToken", AuthController.refresh);
+authRouter.post("/logout", AuthController.logout);
 
-module.exports = router;
+export { authRouter };

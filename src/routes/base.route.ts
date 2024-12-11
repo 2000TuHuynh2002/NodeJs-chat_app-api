@@ -1,9 +1,10 @@
 import express from "express";
 
-const router = express.Router();
-const BaseController = require("../controllers/base.controller");
+import { BaseController } from "../controllers/base.controller";
 
-router.get("/up", BaseController.up);
-router.get("/", BaseController.home);
+const baseRouter = express.Router();
 
-module.exports = router;
+baseRouter.get("/up", BaseController.up);
+baseRouter.get("/", BaseController.home);
+
+export { baseRouter };

@@ -4,7 +4,11 @@ import validator from "validator";
 const UserModel = require("../models/user.model");
 
 class RegisterMiddleware {
-  async checkNull(req: Request, res: Response, next: NextFunction) {
+  static checkNull = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     const { name, username, email, password, password_confirmation } = req.body;
     let errors = [];
 
@@ -32,9 +36,13 @@ class RegisterMiddleware {
     }
 
     next();
-  }
+  };
 
-  async checkValidation(req: Request, res: Response, next: NextFunction) {
+  static checkValidation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     const { name, username, email, password, password_confirmation } = req.body;
     let errors = [];
 
@@ -67,9 +75,13 @@ class RegisterMiddleware {
     }
 
     next();
-  }
+  };
 
-  async checkDuplication(req: Request, res: Response, next: NextFunction) {
+  static checkDuplication = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     const { email, username } = req.body;
     let errors = [];
 
@@ -88,7 +100,7 @@ class RegisterMiddleware {
     }
 
     next();
-  }
+  };
 }
 
-module.exports = new RegisterMiddleware();
+export { RegisterMiddleware };

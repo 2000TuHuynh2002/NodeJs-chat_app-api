@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 class LoginMiddleware {
-  async checkNull(req: Request, res: Response, next: NextFunction) {
+  static checkNull= async(req: Request, res: Response, next: NextFunction) => {
     const { username, password } = req.body;
     let errors = [];
 
@@ -21,4 +21,4 @@ class LoginMiddleware {
   }
 }
 
-module.exports = new LoginMiddleware();
+export { LoginMiddleware };

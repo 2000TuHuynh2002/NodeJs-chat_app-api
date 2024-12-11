@@ -13,7 +13,7 @@ model user {
   username String @unique(map: "username_1")
   password String
 
-  roles     Role[]   @default([USER])
+  roles     role[]   @default([USER])
   blockedBy String[] @default([])
 
   firstName   String?
@@ -31,6 +31,12 @@ model user {
   updatedAt DateTime @updatedAt
 }
 
+enum role {
+  ADMIN
+  MODERATOR
+  USER
+}
+
 model friend {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
@@ -45,22 +51,33 @@ model friend {
 }
 
 model message {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  senderId   String   @db.ObjectId
-  senderName String
-  receiverId String   @db.ObjectId
-  text       String   @default("")
-  image      String   @default("")
-  status     String   @default("unseen")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String   @db.ObjectId
+  senderId       String   @db.ObjectId
+  recipientId    String   @db.ObjectId
+  content        String   @default("")
+  status         status   @default(SENT)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  sender   user @relation(name: "sentMessages", fields: [senderId], references: [id])
-  receiver user @relation(name: "receivedMessages", fields: [receiverId], references: [id])
+  conversation conversation @relation(name: "conversation", fields: [conversationId], references: [id])
+  sender       user         @relation(name: "sentMessages", fields: [senderId], references: [id])
+  recipient    user         @relation(name: "receivedMessages", fields: [recipientId], references: [id])
 }
 
-enum Role {
-  ADMIN
-  MODERATOR
-  USER
+enum status {
+  UNSEEN
+  SEEN
+  SENT
+}
+
+model conversation {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  participants String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  messages message[] @relation(name: "conversation")
+
+  @@unique([participants])
 }

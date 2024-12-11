@@ -4,7 +4,11 @@ const UserModel = require("../models/user.model");
 
 class UserController {
   // [GET] /api/user/list
-  async getAllUsers(req: Request, res: Response, next: NextFunction) {
+  static getAllUsers = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const users = await UserModel.fetchAll();
       if (users.length === 0) {
@@ -17,10 +21,14 @@ class UserController {
         res.status(500).json({ message: error.message });
       }
     }
-  }
+  };
 
   // [GET] /api/user/username/{username}
-  async getUserByUsername(req: Request, res: Response, next: NextFunction) {
+  static getUserByUsername = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user = await UserModel.findByUsername(req.query.value);
       if (user === null) {
@@ -33,10 +41,14 @@ class UserController {
         res.status(500).json({ message: "Not valid" });
       }
     }
-  }
+  };
 
   // [GET] /api/user/email/{email}
-  async getUserByEmail(req: Request, res: Response, next: NextFunction) {
+  static getUserByEmail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const user = await UserModel.findByEmail(req.query.value);
       if (user === null) {
@@ -49,7 +61,7 @@ class UserController {
         res.status(500).json({ message: "Not valid" });
       }
     }
-  }
+  };
 }
 
-module.exports = new UserController();
+export { UserController };
