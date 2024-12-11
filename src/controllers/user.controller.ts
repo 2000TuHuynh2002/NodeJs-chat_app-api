@@ -4,11 +4,7 @@ const UserModel = require("../models/user.model");
 
 class UserController {
   // [GET] /api/user/list
-  static getAllUsers = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  static getAllUsers = async (req: Request, res: Response) => {
     try {
       const users = await UserModel.fetchAll();
       if (users.length === 0) {
@@ -24,11 +20,7 @@ class UserController {
   };
 
   // [GET] /api/user/username/{username}
-  static getUserByUsername = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  static getUserByUsername = async (req: Request, res: Response) => {
     try {
       const user = await UserModel.findByUsername(req.query.value);
       if (user === null) {
@@ -44,11 +36,7 @@ class UserController {
   };
 
   // [GET] /api/user/email/{email}
-  static getUserByEmail = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  static getUserByEmail = async (req: Request, res: Response) => {
     try {
       const user = await UserModel.findByEmail(req.query.value);
       if (user === null) {

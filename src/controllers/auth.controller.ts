@@ -15,7 +15,7 @@ const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
 class AuthController {
   // [POST] /api/auth/login
-  static login = async (req: Request, res: Response, next: NextFunction) => {
+  static login = async (req: Request, res: Response) => {
     try {
       const { username, password } = req.body;
 
@@ -77,7 +77,7 @@ class AuthController {
   };
 
   // [POST] /api/auth/register
-  static register = async (req: Request, res: Response, next: NextFunction) => {
+  static register = async (req: Request, res: Response) => {
     try {
       const { username, email, password, firstName, lastName } = req.body;
 
@@ -110,7 +110,7 @@ class AuthController {
   };
 
   // [POST] /api/auth/refreshToken
-  static refresh = async (req: Request, res: Response, next: NextFunction) => {
+  static refresh = async (req: Request, res: Response) => {
     try {
       const { refreshToken } = req.cookies || {};
 
@@ -182,7 +182,7 @@ class AuthController {
   };
 
   // [POST] /api/auth/logout
-  static logout = async (req: Request, res: Response, next: NextFunction) => {
+  static logout = async (req: Request, res: Response) => {
     try {
       const { refreshToken } = req.cookies || {};
       if (!refreshToken) {

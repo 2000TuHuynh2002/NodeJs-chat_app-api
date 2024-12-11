@@ -3,11 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { MessageModel as message } from "../models/message.model";
 
 class MessageController {
-  static getLastMessage = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  static getLastMessage = async (req: Request, res: Response) => {
     try {
       const converastionId = req.params.id;
       const lastMessage = await message.getLastMessage(converastionId);
@@ -17,35 +13,15 @@ class MessageController {
     }
   };
 
-  static getMessage = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {};
+  static getMessage = async (req: Request, res: Response) => {};
 
-  static sendMessage = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {};
+  static sendMessage = async (req: Request, res: Response) => {};
 
-  static sendImage = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {};
+  static sendImage = async (req: Request, res: Response) => {};
 
-  static delivaredMessage = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {};
+  static delivaredMessage = async (req: Request, res: Response) => {};
 
-  static seenMessage = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {};
+  static seenMessage = async (req: Request, res: Response) => {};
 }
 
 export { MessageController };
