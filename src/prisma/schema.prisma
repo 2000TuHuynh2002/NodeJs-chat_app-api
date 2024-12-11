@@ -21,11 +21,8 @@ model user {
   dayOfBirth  Int?
   phoneNumber String? @unique(map: "phoneNumber_1")
 
-  userFriends       friend[] @relation(name: "users")
-  friendUserFriends friend[] @relation(name: "friend_users")
-
-  senderId   message[] @relation(name: "sentMessages")
-  receiverId message[] @relation(name: "receivedMessages")
+  conversations   conversation[] @relation(fields: [conversationsId], references: [id])
+  conversationsId String[]       @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -37,47 +34,34 @@ enum role {
   USER
 }
 
-model friend {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String   @db.ObjectId
-  friendUserId String   @db.ObjectId
-  user         user     @relation(name: "users", fields: [userId], references: [id])
-  friend       user     @relation(name: "friend_users", fields: [friendUserId], references: [id])
-  status       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model conversation {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  @@unique([userId, friendUserId])
+  members  user[]   @relation(fields: [memberId], references: [id])
+  memberId String[] @db.ObjectId
+
+  messages message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model message {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  conversationId String   @db.ObjectId
-  senderId       String   @db.ObjectId
-  recipientId    String   @db.ObjectId
-  content        String   @default("")
-  status         status   @default(SENT)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  senderId    String @db.ObjectId
+  recipientId String @db.ObjectId
+  content     String @default("")
+  status      status @default(SENT)
 
-  conversation conversation @relation(name: "conversation", fields: [conversationId], references: [id])
-  sender       user         @relation(name: "sentMessages", fields: [senderId], references: [id])
-  recipient    user         @relation(name: "receivedMessages", fields: [recipientId], references: [id])
+  conversation   conversation @relation(fields: [conversationId], references: [id])
+  conversationId String       @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum status {
   UNSEEN
   SEEN
   SENT
-}
-
-model conversation {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  participants String[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  messages message[] @relation(name: "conversation")
-
-  @@unique([participants])
 }
