@@ -1,9 +1,11 @@
 import express, { Express } from "express";
-import router from "./routes/app.route";
+import { createServer } from "http";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import CorsMiddleware from "./middlewares/cors.middleware";
+import { CorsMiddleware } from "./middlewares/cors.middleware";
+import { socket } from "../socket/socket";
+import { appRouter } from "./routes/app.route";
 
 require("dotenv").config();
 
@@ -17,8 +19,11 @@ app.use(cookieParser());
 app.use(cors(CorsMiddleware.coreOptions));
 app.use(morgan("combined"));
 
-router(app);
+appRouter(app);
 
-app.listen(port, () => {
+const httpServer = createServer(app);
+socket(httpServer);
+
+httpServer.listen(port, () => {
   console.log(`[*] Server is running on port ${port}`);
 });

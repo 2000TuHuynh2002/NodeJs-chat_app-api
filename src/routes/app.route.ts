@@ -1,18 +1,19 @@
 import { Express } from "express";
 
-const ErrorController = require("../controllers/error.controller");
+import { ErrorController } from "../controllers/error.controller";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
 
-const AuthMiddleware = require("../middlewares/auth.middleware");
+import { authRouter } from "../routes/auth.route";
+import { baseRouter } from "../routes/base.route";
+import { messageRouter } from "../routes/message.route";
+import { userRouter } from "../routes/user.route";
 
-const authRoute = require("../routes/auth.route");
-const baseRoute = require("../routes/base.route");
-const userRoute = require("../routes/user.route");
-
-function router(app: Express) {
-  app.use("/api", baseRoute);
-  app.use("/api/auth", authRoute);
-  app.use("/api/user", AuthMiddleware.auth, userRoute);
+const appRouter = (app: Express) => {
+  app.use("/api", baseRouter);
+  app.use("/api/auth", authRouter);
+  app.use("/api/message", AuthMiddleware.auth, messageRouter);
+  app.use("/api/user", AuthMiddleware.auth, userRouter);
   app.use(ErrorController.get404);
-}
+};
 
-export default router;
+export { appRouter };

@@ -1,22 +1,21 @@
-require("dotenv").config();
+import { PrismaClient, Prisma } from "@prisma/client";
 
-const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-class User {
+class UserModel {
   static fetchAll() {
     return prisma.user.findMany();
   }
 
-  static findById(id: Number) {
+  static findById(id: string) {
     return prisma.user.findUnique({
       where: {
         id: id,
       },
     });
   }
-  
-  static findByUsername(username: String) {
+
+  static findByUsername(username: string) {
     return prisma.user.findUnique({
       where: {
         username: username,
@@ -24,7 +23,7 @@ class User {
     });
   }
 
-  static findByEmail(email: String) {
+  static findByEmail(email: string) {
     return prisma.user.findUnique({
       where: {
         email: email,
@@ -32,11 +31,11 @@ class User {
     });
   }
 
-  static createUser(user: Object) {
+  static createUser(user: Prisma.userCreateInput) {
     return prisma.user.create({
       data: user,
     });
   }
 }
 
-module.exports = User;
+export { UserModel };

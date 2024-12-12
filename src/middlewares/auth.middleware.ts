@@ -1,13 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 
-import AuthTokenHelper from "../utils/auth-token";
-
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
 
 class AuthMiddleware {
-  async auth(req: Request, res: Response, next: NextFunction) {
+  static auth = (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.header("Authorization")?.replace("Bearer ", "");
 
@@ -26,7 +24,7 @@ class AuthMiddleware {
       }
       res.status(500).json({ status: "error", message: err.message });
     }
-  }
+  };
 }
 
-module.exports = new AuthMiddleware();
+export { AuthMiddleware };

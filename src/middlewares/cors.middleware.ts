@@ -1,7 +1,7 @@
 import cors from "cors";
 
 class CorsMiddleware {
-  public coreOptions: cors.CorsOptions = {
+  static coreOptions: cors.CorsOptions = {
     origin: function (origin, callback) {
       if (!origin) callback(null, true);
 
@@ -24,4 +24,4 @@ class CorsMiddleware {
   };
 }
 
-export default new CorsMiddleware();
+export { CorsMiddleware };
