@@ -131,8 +131,10 @@ class AuthController {
         userId,
         refreshToken
       );
-
+      
       if (!isTokenExist) {
+        res.clearCookie("refreshToken");
+        res.clearCookie("isLoggedIn");
         return res.status(401).json({ error: "Refesh token is invalid" });
       }
 
