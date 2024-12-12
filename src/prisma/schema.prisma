@@ -21,8 +21,8 @@ model user {
   dayOfBirth  Int?
   phoneNumber String? @unique(map: "phoneNumber_1")
 
-  conversations   conversation[] @relation(fields: [conversationsId], references: [id])
-  conversationsId String[]       @db.ObjectId
+  rooms   room[]   @relation(fields: [roomsId], references: [id])
+  roomsId String[] @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -34,11 +34,12 @@ enum role {
   USER
 }
 
-model conversation {
+model room {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  members  user[]   @relation(fields: [memberId], references: [id])
-  memberId String[] @db.ObjectId
+  membersCount Int
+  members      user[]   @relation(fields: [memberId], references: [id])
+  memberId     String[] @db.ObjectId
 
   messages message[]
 
@@ -53,8 +54,8 @@ model message {
   content     String @default("")
   status      status @default(SENT)
 
-  conversation   conversation @relation(fields: [conversationId], references: [id])
-  conversationId String       @db.ObjectId
+  room   room   @relation(fields: [roomId], references: [id])
+  roomId String @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

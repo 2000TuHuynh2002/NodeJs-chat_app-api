@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { UserModel as User } from "../models/user.model";
