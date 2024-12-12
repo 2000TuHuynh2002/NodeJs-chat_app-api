@@ -1,7 +1,12 @@
 import { Server, Socket } from "socket.io";
 
 export const socket = (server: any) => {
-  const io = new Server(server)
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+  })
   
   type User = {
     userId: string | null;
@@ -92,5 +97,9 @@ export const socket = (server: any) => {
       removeUser(socket.id);
       io.emit("getUser", users);
     });
+
+    socket.on("message", (data: any) => {
+      console.log(data);
+    })
   });
 }
