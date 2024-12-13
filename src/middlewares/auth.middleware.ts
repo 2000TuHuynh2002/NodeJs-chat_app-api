@@ -1,3 +1,4 @@
+import { error } from "console";
 import { Request, Response, NextFunction } from "express";
 
 require("dotenv").config();
@@ -20,9 +21,9 @@ class AuthMiddleware {
       if (err.message === "jwt expired") {
         return res
           .status(401)
-          .json({ status: "error", message: "Access token expired" });
+          .json({ error: "Access token expired" });
       }
-      res.status(500).json({ status: "error", message: err.message });
+      res.status(500).json({ error: err.message });
     }
   };
 }
