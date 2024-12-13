@@ -59,7 +59,6 @@ class AuthController {
       res.status(200).json({
         message: "Login Successfully",
         user: {
-          _id: user.id,
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -96,7 +95,6 @@ class AuthController {
         status: "201",
         message: "User created successfully",
         data: {
-          _id: newUser.id,
           username: newUser.username,
           firstName: newUser.firstName,
           lastName: newUser.lastName,
@@ -165,7 +163,6 @@ class AuthController {
       res.status(200).json({
         message: "Token refreshed successfully",
         user: {
-          _id: user.id,
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,

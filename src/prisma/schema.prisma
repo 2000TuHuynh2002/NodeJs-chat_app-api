@@ -35,7 +35,8 @@ enum role {
 }
 
 model room {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  room_id String @unique
 
   membersCount Int
   members      user[]   @relation(fields: [memberId], references: [id])

@@ -31,6 +31,8 @@ class UserController {
       res.status(200).json({
         user: {
           username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           password: user.password,
           roles: user.roles,
@@ -55,6 +57,8 @@ class UserController {
       res.status(200).json({
         user: {
           username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           password: user.password,
           roles: user.roles,
