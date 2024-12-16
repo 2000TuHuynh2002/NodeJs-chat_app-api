@@ -1,0 +1,3 @@
+#!/bin/bash
+#echo $$ > /tmp/ffmpeg_btv1.sh 
+ffmpeg -i "udp://232.3.1.96:10096?buffer_size=10000000^&fifo_size=10000000^&overrun_nonfatal=1" -i sctvlogo.png -filter_complex "overlay=W-w-10:H-h-10" -pix_fmt yuv420p -deinterlace -s 1024x576 -threads 0 -vcodec libx264 -r 25 -g 300 -sc_threshold 0 -bufsize 100M -b:v 1.5M -preset medium -profile:v high -aspect 16:9 -tune zerolatency -acodec aac -b:a 192k -ac 2 -ar 48000 -af "aresample=async=1:min_hard_comp=0.100000:first_pts=0" -vbsf h264_mp4toannexb -f flv rtmp://172.29.2.131:1935/hls/btv1 > /dev/null 2>&1 &

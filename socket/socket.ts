@@ -36,7 +36,7 @@ export const socket = (server: any) => {
   };
   
   io.on("connection", (socket: Socket) => {
-    console.log("Socket is connecting...");
+    console.log("[*] Socket is connecting...");
     socket.on("addUser", (userId: string, userInfo: any) => {
       addUser(userId, socket.id, userInfo);
       io.emit("getUsers", users);
@@ -93,7 +93,7 @@ export const socket = (server: any) => {
     });
   
     socket.on("disconnect", () => {
-      console.log("user is disconnect... ");
+      console.log("[*] User is disconnect... ");
       removeUser(socket.id);
       io.emit("getUser", users);
     });

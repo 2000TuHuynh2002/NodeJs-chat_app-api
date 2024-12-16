@@ -1,6 +1,21 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  omit: {
+    user: {
+      password: true,
+      blockedBy: true,
+
+      dayOfBirth: true,
+      phoneNumber: true,
+
+      roomsId: true,
+
+      createdAt: true,
+      updatedAt: true,
+    }
+  }
+});
 
 class UserModel {
   static fetchAll() {
@@ -22,6 +37,18 @@ class UserModel {
       },
     });
   }
+
+  static findByUsernameWithPassword(username: string) {
+    return prisma.user.findUnique({
+      omit: {
+        password: false,
+      },
+      where: {
+        username: username,
+      },
+    });
+  }
+
 
   static findByEmail(email: string) {
     return prisma.user.findUnique({

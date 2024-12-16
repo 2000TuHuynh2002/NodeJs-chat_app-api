@@ -13,7 +13,7 @@ const appRouter = (app: Express) => {
   app.use("/api", baseRouter);
   app.use("/api/auth", authRouter);
   app.use("/api/message", AuthMiddleware.auth, messageRouter);
-  app.use("/api/room", roomRouter);
+  app.use("/api/room", AuthMiddleware.auth, roomRouter);
   app.use("/api/user", AuthMiddleware.auth, userRouter);
   app.use(ErrorController.get404);
 };

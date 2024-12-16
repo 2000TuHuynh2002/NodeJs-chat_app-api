@@ -1,15 +1,25 @@
 import { Request, Response } from "express";
 
 import { MessageModel as message } from "../models/message.model";
+import { RoomModel as Room } from "../models/room.model";
 
 class MessageController {
-  static getLastMessage = async (req: Request, res: Response) => {
-    try {
-      const converastionId = req.params.id;
-      const lastMessage = await message.getLastMessage(converastionId);
-      res.status(200).json(lastMessage);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
+  static getRecentMessages = async (req: Request, res: Response) => {
+try {    
+  const userId = req.body.userId;
+    const getRecentMessages = await Room.getRecentMessages(userId);
+    if (!getRecentMessages) {
+      return res.status(404).json({ message: "No recent messages found" });
+    }
+
+    res.status(200).json({
+      message: "Recent messages found",
+      recentMessages: getRecentMessages,
+    });
+    console.log(getRecentMessages);}
+    catch (err: any) {
+      console.log(err);
+      res.status(500).json({ error: err.message });
     }
   };
 

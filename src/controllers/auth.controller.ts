@@ -9,7 +9,7 @@ import AuthTokenHelper from "../utils/auth-token";
 require("dotenv").config();
 
 const accessSecretKey = process.env.JWT_ACCESS_SECRET_KEY || "secret";
-const accessExpiresIn = process.env.JWT_EXPIRES_IN || "15m";
+const accessExpiresIn = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
 const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY || "secret";
 const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
@@ -19,7 +19,7 @@ class AuthController {
     try {
       const { username, password } = req.body;
 
-      const user = await User.findByUsername(username.toLowerCase());
+      const user = await User.findByUsernameWithPassword(username.toLowerCase());
 
       if (user === null) {
         res.status(401).json({ error: "User not found" });

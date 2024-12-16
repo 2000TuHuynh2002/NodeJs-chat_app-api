@@ -4,7 +4,7 @@ import { MessageController } from "../controllers/message.controller";
 
 const messageRouter = express.Router();
 
-messageRouter.get("/last-message/:id", MessageController.getLastMessage);
+messageRouter.get("/recent", MessageController.getRecentMessages);
 messageRouter.get("/get-message/:id", MessageController.getMessage);
 
 messageRouter.post("/send-message", MessageController.sendMessage);

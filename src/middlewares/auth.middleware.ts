@@ -1,4 +1,3 @@
-import { error } from "console";
 import { Request, Response, NextFunction } from "express";
 
 require("dotenv").config();
@@ -14,7 +13,9 @@ class AuthMiddleware {
         return res.status(401).json({ error: "Access denied" });
       }
 
-      jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY);
+      
+      req.body.userId = decoded._id;
 
       next();
     } catch (err: any) {
