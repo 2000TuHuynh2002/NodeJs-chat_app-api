@@ -59,6 +59,7 @@ class AuthController {
       res.status(200).json({
         message: "Login Successfully",
         user: {
+          id: user.id,
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -95,6 +96,7 @@ class AuthController {
         status: "201",
         message: "User created successfully",
         data: {
+          id: newUser.id,
           username: newUser.username,
           firstName: newUser.firstName,
           lastName: newUser.lastName,
@@ -129,11 +131,11 @@ class AuthController {
         userId,
         refreshToken
       );
-      
+
       if (!isTokenExist) {
         res.clearCookie("refreshToken");
         res.clearCookie("isLoggedIn");
-        return res.status(401).json({ error: "Refesh token is invalid" });
+        return res.status(401).json({ error: "Refresh token is invalid" });
       }
 
       const newAccessToken = jwt.sign({ _id: decoded._id }, accessSecretKey, {
@@ -163,6 +165,7 @@ class AuthController {
       res.status(200).json({
         message: "Token refreshed successfully",
         user: {
+          id: user.id,
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -197,7 +200,7 @@ class AuthController {
       );
 
       if (!isTokenExist) {
-        return res.status(401).json({ error: "Refesh token is invalid" });
+        return res.status(401).json({ error: "Refresh token is invalid" });
       }
 
       res.clearCookie("refreshToken");

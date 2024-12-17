@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
-import { MessageModel as message } from "../models/message.model";
+import { MessageModel as Message } from "../models/message.model";
+import { MessageModel as Message } from "../models/message.model";
 import { RoomModel as Room } from "../models/room.model";
 
 class MessageController {
@@ -25,11 +26,32 @@ try {
 
   static getMessage = async (req: Request, res: Response) => {};
 
-  static sendMessage = async (req: Request, res: Response) => {};
+  static sendMessage = async (req: Request, res: Response) => {
+    try {
+      const { senderId, recipientId, message, roomId } = req.body;
+
+      const data = {
+        senderId: senderId,
+        recipientId: recipientId,
+        content: message,
+        roomId: roomId,
+      }
+
+      const sendMessage = await Message.create(data);
+      if (!sendMessage) {
+        return res.status(400).json({ message: "Message not sent" });
+      }
+
+      res.status(200).json({ message: "Message sent", sendMessage });
+    } catch (err: any) {
+      console.log(err);
+      res.status(500).json({ error: err.message });
+    }
+  };
 
   static sendImage = async (req: Request, res: Response) => {};
 
-  static delivaredMessage = async (req: Request, res: Response) => {};
+  static deliveredMessage = async (req: Request, res: Response) => {};
 
   static seenMessage = async (req: Request, res: Response) => {};
 }

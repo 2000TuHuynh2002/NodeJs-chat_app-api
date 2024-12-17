@@ -49,7 +49,7 @@ export const socket = (server: any) => {
       }
     });
   
-    socket.on("sendMessage", (data: any) => {
+    socket.on("send", (data: any) => {
       const user = findFriend(data.reseverId);
   
       if (user !== undefined) {
@@ -98,7 +98,7 @@ export const socket = (server: any) => {
       io.emit("getUser", users);
     });
 
-    socket.on("message", (data: any) => {
+    socket.on("sendMessage", (data: any) => {
       console.log(data);
     })
   });

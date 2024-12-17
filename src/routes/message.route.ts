@@ -10,7 +10,7 @@ messageRouter.get("/get-message/:id", MessageController.getMessage);
 messageRouter.post("/send-message", MessageController.sendMessage);
 messageRouter.post("/send-image", MessageController.sendImage);
 
-messageRouter.post("/delivared-message", MessageController.delivaredMessage);
+messageRouter.post("/delivered-message", MessageController.deliveredMessage);
 messageRouter.post("/seen-message", MessageController.seenMessage);
 
 export { messageRouter };
