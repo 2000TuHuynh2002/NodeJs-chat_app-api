@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 
 import { MessageModel as Message } from "../models/message.model";
-import { MessageModel as Message } from "../models/message.model";
 import { RoomModel as Room } from "../models/room.model";
 
 class MessageController {
@@ -28,12 +27,12 @@ try {
 
   static sendMessage = async (req: Request, res: Response) => {
     try {
-      const { senderId, recipientId, message, roomId } = req.body;
+      const { senderId, recipientId, content, roomId } = req.body;
 
       const data = {
         senderId: senderId,
         recipientId: recipientId,
-        content: message,
+        content: content,
         roomId: roomId,
       }
 

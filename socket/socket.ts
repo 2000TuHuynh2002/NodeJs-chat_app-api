@@ -37,6 +37,9 @@ export const socket = (server: any) => {
   
   io.on("connection", (socket: Socket) => {
     console.log("[*] Socket is connecting...");
+
+    socket.join("675bde50c7cb7a512e2fe803");
+
     socket.on("addUser", (userId: string, userInfo: any) => {
       addUser(userId, socket.id, userInfo);
       io.emit("getUsers", users);
@@ -98,8 +101,10 @@ export const socket = (server: any) => {
       io.emit("getUser", users);
     });
 
-    socket.on("sendMessage", (data: any) => {
-      console.log(data);
+    socket.on("sendMessage", (room, message ) => {
+      console.log("room", room);
+      console.log("message", message);
+      io.to(room).emit("getMessage", message);
     })
   });
 }
