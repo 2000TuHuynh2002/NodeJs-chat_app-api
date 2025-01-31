@@ -29,7 +29,7 @@ class UserModel {
       },
     });
   }
-
+  
   static findByUsername(username: string) {
     return prisma.user.findUnique({
       where: {
@@ -48,7 +48,6 @@ class UserModel {
       },
     });
   }
-
 
   static findByEmail(email: string) {
     return prisma.user.findUnique({

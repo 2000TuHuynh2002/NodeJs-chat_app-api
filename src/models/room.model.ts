@@ -42,36 +42,56 @@ class RoomModel {
     return prisma.room.findFirst({
       where: {
         members: {
-          every: { id: { in: memberIdList } }
-        }
-      },
-    });
-  }
-
-  static async getRecentMessages(userId: string, page: number = 1) {
-    const pageSize = 20;
-    return prisma.room.findMany({
-      where: {
-        members: {
-          some: { id: userId },
+          every: { id: { in: memberIdList } },
         },
       },
       include: {
-        messages: {
-          take: 30,
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        members: {
-          skip: (page - 1) * pageSize,
-          take: pageSize,
-          orderBy: {
-            updatedAt: "desc",
-          },
-        },
-      },
+        _count: {
+          select: {
+            messages: true
+          }
+        }
+      }
     });
+  }
+
+  static async getRecentRoom(userId: string, page: number = 1) {
+    return prisma.room
+      .findMany({
+        where: {
+          members: {
+            some: { id: userId },
+          },
+          messages: {
+            some: {} // This ensures rooms have at least one message
+          }
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+        include: {
+          messages: {
+            take: 1,
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
+          members: {
+            where: {
+              id: {
+                not: userId,
+              },
+            },
+          },
+        },
+      })
+      .then((rooms) => {
+        return rooms.map((room: any) => {
+          room.friend = room.members[0];
+          delete room.members;
+          return room;
+        });
+      });
   }
 }
 

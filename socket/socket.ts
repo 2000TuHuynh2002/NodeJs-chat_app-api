@@ -6,105 +6,22 @@ export const socket = (server: any) => {
       origin: "*",
       methods: ["GET", "POST"],
     },
-  })
-  
-  type User = {
-    userId: string | null;
-    socketId: string | null;
-    userInfo: any;
-  };
-  
-  let users: User[] = [];
-  
-  const addUser = (userId: string, socketId: string, userInfo: any) => {
-    const checkUser = users.some((user) => user.userId === userId);
-    if (!checkUser) {
-      users.push({ userId, socketId, userInfo: null });
-    }
-  };
-  
-  const removeUser = (socketId: string) => {
-    users = users.filter((user) => user.socketId !== socketId);
-  };
-  
-  const findFriend = (userId: string) => {
-    return users.find((user) => user.userId === userId);
-  };
-  
-  const logoutUser = (userId: string) => {
-    users = users.filter((user) => user.userId !== userId);
-  };
-  
+  });
+
   io.on("connection", (socket: Socket) => {
     console.log("[*] Socket is connecting...");
 
-    socket.join("675bde50c7cb7a512e2fe803");
+    socket.on("userID", async (userId: string) => {
+      console.log("[*] User ID is ", userId);
+      socket.join(userId);
+    });
 
-    socket.on("addUser", (userId: string, userInfo: any) => {
-      addUser(userId, socket.id, userInfo);
-      io.emit("getUsers", users);
-  
-      const us = users.filter((user) => user.userId !== userId);
-      const con = "new_user_add";
-  
-      for (var i = 0; i < us.length; i++) {
-        socket.to(us[i].socketId || "").emit("new_user_add", con);
-      }
-    });
-  
-    socket.on("send", (data: any) => {
-      const user = findFriend(data.reseverId);
-  
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("getMessage", data);
-      }
-    });
-  
-    socket.on("messageSeen", (msg: any) => {
-      const user = findFriend(msg.senderId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("msgSeenResponse", msg);
-      }
-    });
-  
-    socket.on("delivaredMessage", (msg: any) => {
-      const user = findFriend(msg.senderId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("msgDelivaredResponse", msg);
-      }
-    });
-    socket.on("seen", (data: any) => {
-      const user = findFriend(data.senderId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("seenSuccess", data);
-      }
-    });
-  
-    socket.on("typingMessage", (data: any) => {
-      const user = findFriend(data.reseverId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("typingMessageGet", {
-          senderId: data.senderId,
-          reseverId: data.reseverId,
-          msg: data.msg,
-        });
-      }
-    });
-  
-    socket.on("logout", (userId: string) => {
-      logoutUser(userId);
-    });
-  
     socket.on("disconnect", () => {
       console.log("[*] User is disconnect... ");
-      removeUser(socket.id);
-      io.emit("getUser", users);
     });
 
-    socket.on("sendMessage", (room, message ) => {
-      console.log("room", room);
-      console.log("message", message);
-      io.to(room).emit("getMessage", message);
-    })
+    socket.on("sendMessage", (receiverId, message) => {
+      io.to(receiverId).emit("receiveMessage", message);
+    });
   });
-}
+};

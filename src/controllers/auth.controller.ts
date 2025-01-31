@@ -93,7 +93,6 @@ class AuthController {
       });
 
       res.status(201).json({
-        status: "201",
         message: "User created successfully",
         data: {
           id: newUser.id,
@@ -194,22 +193,21 @@ class AuthController {
       const decoded = jwt.verify(refreshToken, refreshSecretKey) as JwtPayload;
       const userId = decoded._id;
 
+      res.clearCookie("refreshToken");
+      res.clearCookie("isLoggedIn");
+      
       const isTokenExist = await AuthTokenHelper.isTokenExist(
         userId,
         refreshToken
       );
-
+      
       if (!isTokenExist) {
         return res.status(401).json({ error: "Refresh token is invalid" });
       }
 
-      res.clearCookie("refreshToken");
-      res.clearCookie("isLoggedIn");
-
       await AuthTokenHelper.revokeToken(userId, refreshToken);
 
       res.status(200).json({
-        status: "200",
         message: "Logout successfully",
       });
     } catch (err: any) {

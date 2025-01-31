@@ -24,24 +24,29 @@ class RoomController {
     }
 
     const userId_list = [user01.id, user02.id].sort();
-    console.log(userId_list);
     const check = await Room.checkRoomExists(userId_list);
-    console.log(check);
+
     if (check) {
-      return res.status(400).json({ 
+      return res.status(409).json({
         message: "Room already exists",
-        roomId: check.id 
+        room: {
+          roomId: check.id,
+          friend: user01,
+          memberId: userId_list,
+          roomNumberOfMessages: check._count.messages,
+        },
+        updatedAt: check.updatedAt,
       });
     }
 
     const room = await Room.create({
       membersCount: 2,
       members: {
-        connect: userId_list.map(id => ({ id }))
+        connect: userId_list.map((id) => ({ id })),
       },
     });
 
-    res.status(201).json({ 
+    res.status(201).json({
       messaage: "Room created successfully",
       room: room.id,
     });
@@ -55,9 +60,9 @@ class RoomController {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       messaage: "Room found",
-      roomId: room.id
+      roomId: room.id,
     });
   };
 }
