@@ -71,7 +71,7 @@ class RoomModel {
         },
         include: {
           messages: {
-            take: 1,
+            take: 30,
             orderBy: {
               createdAt: "desc",
             },
