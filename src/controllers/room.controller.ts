@@ -48,7 +48,13 @@ class RoomController {
 
     res.status(201).json({
       messaage: "Room created successfully",
-      room: room.id,
+      room: {
+        roomId: room.id,
+        friend: user01,
+        memberId: userId_list,
+        roomNumberOfMessages: 0,
+      },
+      updatedAt: room.updatedAt,
     });
   };
 
