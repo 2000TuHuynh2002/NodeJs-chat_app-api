@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -35,7 +36,7 @@ enum role {
 }
 
 model room {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
 
   membersCount Int
   members      user[]   @relation(fields: [memberId], references: [id])

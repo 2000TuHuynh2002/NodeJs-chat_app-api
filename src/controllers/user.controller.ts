@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 
-const UserModel = require("../models/user.model");
+import { UserModel as User } from "../models/user.model";
 
 class UserController {
   // [GET] /api/user/list
   static getAllUsers = async (req: Request, res: Response) => {
     try {
-      const users = await UserModel.fetchAll();
+      const users = await User.fetchAll();
       if (users.length === 0) {
         res.status(404).json({ message: "No user found" });
         return;
@@ -22,15 +22,18 @@ class UserController {
   // [GET] /api/user/username/{username}
   static getUserByUsername = async (req: Request, res: Response) => {
     try {
-      const user = await UserModel.findByUsername(req.query.value);
+      const queryUsername = req.params.username;
+      const user = await User.findByUsername(queryUsername);
       if (user === null) {
-        res.status(404).json({ message: "User not found" });
+        res.status(404).json({ error: "User not found" });
         return;
       }
-      res.status(200).json({ result: user });
+      res.status(200).json({
+        user: user
+      });
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json({ message: "Not valid" });
+        res.status(500).json({ error: "Not valid" });
       }
     }
   };
@@ -38,15 +41,18 @@ class UserController {
   // [GET] /api/user/email/{email}
   static getUserByEmail = async (req: Request, res: Response) => {
     try {
-      const user = await UserModel.findByEmail(req.query.value);
+      const queryEmail = req.params.email;
+      const user = await User.findByEmail(queryEmail);
       if (user === null) {
-        res.status(404).json({ message: "User not found" });
+        res.status(404).json({ error: "User not found" });
         return;
       }
-      res.status(200).json({ result: user });
+      res.status(200).json({
+        user: user
+      });
     } catch (error: any) {
       if (error instanceof Error) {
-        res.status(500).json({ message: "Not valid" });
+        res.status(500).json({ error: "Not valid" });
       }
     }
   };
