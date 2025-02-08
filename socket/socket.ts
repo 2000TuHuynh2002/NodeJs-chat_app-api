@@ -1,96 +1,56 @@
 import { Server, Socket } from "socket.io";
+import { UserModel } from "../src/models/user.model";
+import { RoomModel } from "../src/models/room.model";
 
 export const socket = (server: any) => {
-  const io = new Server(server)
-  
-  type User = {
-    userId: string | null;
-    socketId: string | null;
-    userInfo: any;
-  };
-  
-  let users: User[] = [];
-  
-  const addUser = (userId: string, socketId: string, userInfo: any) => {
-    const checkUser = users.some((user) => user.userId === userId);
-    if (!checkUser) {
-      users.push({ userId, socketId, userInfo: null });
-    }
-  };
-  
-  const removeUser = (socketId: string) => {
-    users = users.filter((user) => user.socketId !== socketId);
-  };
-  
-  const findFriend = (userId: string) => {
-    return users.find((user) => user.userId === userId);
-  };
-  
-  const logoutUser = (userId: string) => {
-    users = users.filter((user) => user.userId !== userId);
-  };
-  
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+  });
+
   io.on("connection", (socket: Socket) => {
-    console.log("Socket is connecting...");
-    socket.on("addUser", (userId: string, userInfo: any) => {
-      addUser(userId, socket.id, userInfo);
-      io.emit("getUsers", users);
-  
-      const us = users.filter((user) => user.userId !== userId);
-      const con = "new_user_add";
-  
-      for (var i = 0; i < us.length; i++) {
-        socket.to(us[i].socketId || "").emit("new_user_add", con);
-      }
+    console.log("[*] Socket is connecting...");
+
+    socket.on("userID", async (userId: string) => {
+      console.log("[*] User ID is ", userId);
+      socket.join(userId);
     });
-  
-    socket.on("sendMessage", (data: any) => {
-      const user = findFriend(data.reseverId);
-  
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("getMessage", data);
-      }
-    });
-  
-    socket.on("messageSeen", (msg: any) => {
-      const user = findFriend(msg.senderId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("msgSeenResponse", msg);
-      }
-    });
-  
-    socket.on("delivaredMessage", (msg: any) => {
-      const user = findFriend(msg.senderId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("msgDelivaredResponse", msg);
-      }
-    });
-    socket.on("seen", (data: any) => {
-      const user = findFriend(data.senderId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("seenSuccess", data);
-      }
-    });
-  
-    socket.on("typingMessage", (data: any) => {
-      const user = findFriend(data.reseverId);
-      if (user !== undefined) {
-        socket.to(user.socketId || "").emit("typingMessageGet", {
-          senderId: data.senderId,
-          reseverId: data.reseverId,
-          msg: data.msg,
-        });
-      }
-    });
-  
-    socket.on("logout", (userId: string) => {
-      logoutUser(userId);
-    });
-  
+
     socket.on("disconnect", () => {
-      console.log("user is disconnect... ");
-      removeUser(socket.id);
-      io.emit("getUser", users);
+      console.log("[*] User is disconnect... ");
+    });
+
+    socket.on("sendMessage", async (message) => {
+      if (!message.recipientId) {
+        console.error("Message Recipient information is missing");
+        return;
+      }
+
+      const friend = await UserModel.findById(message.senderId);
+      if (!friend) {
+        console.error(`User with ID ${message.senderId} not found`);
+        return;
+      }
+
+      const userId_list = [message.senderId, message.recipientId].sort();
+      const room = await RoomModel.checkRoomExists(userId_list);
+      console.log("Room: ", room?.id);
+      message.roomId = room?.id;
+      message.status = "SENT";
+      message.createdAt = new Date().toISOString();
+      message.updatedAt = new Date().toISOString();
+      message.memberId = userId_list;
+      message.sender = {
+        id: friend.id,
+        email: friend.email,
+        firstName: friend.firstName,
+        lastName: friend.lastName,
+        username: friend.username,
+      };
+      io.to(message.recipientId).emit("receiveMessage", message);
+      console.log("[*] Message sent successfully");
     });
   });
-}
+};
