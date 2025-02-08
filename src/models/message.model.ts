@@ -3,22 +3,21 @@ import { PrismaClient, Prisma } from "@prisma/client";
 const prisma = new PrismaClient();
 
 class MessageModel {
-  static getLastMessage = (conversationId: string) => {
-    return prisma.message.findMany({
-      where: {
-        id: conversationId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 1,
+  static create = async (data: any) => {
+    const message = await prisma.message.create({
+      data: data,
     });
-  };
 
-  static create = (message: Prisma.messageCreateInput) => {
-    return prisma.message.create({
-      data: message,
+    await prisma.room.update({
+      where: {
+        id: data.roomId,
+      },
+      data: {
+        updatedAt: new Date(),
+      },
     });
+
+    return message;
   };
 
   static seen = (messageId: string) => {
@@ -29,6 +28,24 @@ class MessageModel {
       data: {
         status: "SEEN",
       },
+    });
+  };
+
+  static findByRoomId = (
+    roomId: string,
+    page: number = 1,
+    size: number = 20
+  ) => {
+    const skip = (page - 1) * size;
+    return prisma.message.findMany({
+      where: {
+        roomId: roomId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: skip,
+      take: size,
     });
   };
 }

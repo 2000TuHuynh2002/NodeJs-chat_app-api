@@ -9,7 +9,7 @@ import AuthTokenHelper from "../utils/auth-token";
 require("dotenv").config();
 
 const accessSecretKey = process.env.JWT_ACCESS_SECRET_KEY || "secret";
-const accessExpiresIn = process.env.JWT_EXPIRES_IN || "15m";
+const accessExpiresIn = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
 const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY || "secret";
 const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
@@ -19,7 +19,7 @@ class AuthController {
     try {
       const { username, password } = req.body;
 
-      const user = await User.findByUsername(username.toLowerCase());
+      const user = await User.findByUsernameWithPassword(username.toLowerCase());
 
       if (user === null) {
         res.status(401).json({ error: "User not found" });
@@ -59,6 +59,7 @@ class AuthController {
       res.status(200).json({
         message: "Login Successfully",
         user: {
+          id: user.id,
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -92,9 +93,9 @@ class AuthController {
       });
 
       res.status(201).json({
-        status: "201",
         message: "User created successfully",
         data: {
+          id: newUser.id,
           username: newUser.username,
           firstName: newUser.firstName,
           lastName: newUser.lastName,
@@ -129,11 +130,11 @@ class AuthController {
         userId,
         refreshToken
       );
-      
+
       if (!isTokenExist) {
         res.clearCookie("refreshToken");
         res.clearCookie("isLoggedIn");
-        return res.status(401).json({ error: "Refesh token is invalid" });
+        return res.status(401).json({ error: "Refresh token is invalid" });
       }
 
       const newAccessToken = jwt.sign({ _id: decoded._id }, accessSecretKey, {
@@ -163,6 +164,7 @@ class AuthController {
       res.status(200).json({
         message: "Token refreshed successfully",
         user: {
+          id: user.id,
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
@@ -191,22 +193,21 @@ class AuthController {
       const decoded = jwt.verify(refreshToken, refreshSecretKey) as JwtPayload;
       const userId = decoded._id;
 
+      res.clearCookie("refreshToken");
+      res.clearCookie("isLoggedIn");
+      
       const isTokenExist = await AuthTokenHelper.isTokenExist(
         userId,
         refreshToken
       );
-
+      
       if (!isTokenExist) {
-        return res.status(401).json({ error: "Refesh token is invalid" });
+        return res.status(401).json({ error: "Refresh token is invalid" });
       }
-
-      res.clearCookie("refreshToken");
-      res.clearCookie("isLoggedIn");
 
       await AuthTokenHelper.revokeToken(userId, refreshToken);
 
       res.status(200).json({
-        status: "200",
         message: "Logout successfully",
       });
     } catch (err: any) {

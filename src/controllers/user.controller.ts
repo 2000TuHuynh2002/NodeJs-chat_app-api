@@ -29,14 +29,7 @@ class UserController {
         return;
       }
       res.status(200).json({
-        user: {
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          password: user.password,
-          roles: user.roles,
-        },
+        user: user
       });
     } catch (error) {
       if (error instanceof Error) {
@@ -55,14 +48,7 @@ class UserController {
         return;
       }
       res.status(200).json({
-        user: {
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          password: user.password,
-          roles: user.roles,
-        },
+        user: user
       });
     } catch (error: any) {
       if (error instanceof Error) {
