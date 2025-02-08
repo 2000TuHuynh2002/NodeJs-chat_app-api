@@ -1,26 +1,25 @@
 import bcrypt from "bcrypt";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-import AuthTokenHelper from "../utils/auth-token";
+import { UserModel as User } from "../models/user.model";
 import { unixTimeNow, convertToSecond } from "../utils/base-unixTime";
+import AuthTokenHelper from "../utils/auth-token";
 
 require("dotenv").config();
 
 const accessSecretKey = process.env.JWT_ACCESS_SECRET_KEY || "secret";
-const accessExpiresIn = process.env.JWT_EXPIRES_IN || "15m";
+const accessExpiresIn = process.env.JWT_ACCESS_EXPIRES_IN || "15m";
 const refreshSecretKey = process.env.JWT_REFRESH_SECRET_KEY || "secret";
 const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
 
-const User = require("../models/user.model");
-
 class AuthController {
   // [POST] /api/auth/login
-  async login(req: Request, res: Response, next: NextFunction) {
+  static login = async (req: Request, res: Response) => {
     try {
       const { username, password } = req.body;
 
-      const user = await User.findByUsername(username.toLowerCase());
+      const user = await User.findByUsernameWithPassword(username.toLowerCase());
 
       if (user === null) {
         res.status(401).json({ error: "User not found" });
@@ -60,8 +59,10 @@ class AuthController {
       res.status(200).json({
         message: "Login Successfully",
         user: {
-          _id: user.id,
+          id: user.id,
           username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           roles: user.roles,
         },
@@ -73,29 +74,31 @@ class AuthController {
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
     }
-  }
+  };
 
   // [POST] /api/auth/register
-  async register(req: Request, res: Response, next: NextFunction) {
+  static register = async (req: Request, res: Response) => {
     try {
-      const { name, username, email, password } = req.body;
+      const { username, email, password, firstName, lastName } = req.body;
 
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(password, salt);
 
       const newUser = await User.createUser({
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
         username: username.toLowerCase(),
         email: email.toLowerCase(),
         password: hash,
       });
 
       res.status(201).json({
-        status: "201",
         message: "User created successfully",
         data: {
-          _id: newUser.id,
+          id: newUser.id,
           username: newUser.username,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
           email: newUser.email,
           roles: newUser.roles,
         },
@@ -103,10 +106,10 @@ class AuthController {
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
     }
-  }
+  };
 
   // [POST] /api/auth/refreshToken
-  async refreshToken(req: Request, res: Response, next: NextFunction) {
+  static refresh = async (req: Request, res: Response) => {
     try {
       const { refreshToken } = req.cookies || {};
 
@@ -119,13 +122,19 @@ class AuthController {
 
       const user = await User.findById(userId);
 
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
+
       const isTokenExist = await AuthTokenHelper.isTokenExist(
         userId,
         refreshToken
       );
 
       if (!isTokenExist) {
-        return res.status(401).json({ error: "Refesh token is invalid" });
+        res.clearCookie("refreshToken");
+        res.clearCookie("isLoggedIn");
+        return res.status(401).json({ error: "Refresh token is invalid" });
       }
 
       const newAccessToken = jwt.sign({ _id: decoded._id }, accessSecretKey, {
@@ -155,8 +164,10 @@ class AuthController {
       res.status(200).json({
         message: "Token refreshed successfully",
         user: {
-          _id: user.id,
+          id: user.id,
           username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           roles: user.roles,
         },
@@ -169,10 +180,10 @@ class AuthController {
       console.log(err);
       res.status(500).json({ error: err.message });
     }
-  }
+  };
 
   // [POST] /api/auth/logout
-  async logout(req: Request, res: Response, next: NextFunction) {
+  static logout = async (req: Request, res: Response) => {
     try {
       const { refreshToken } = req.cookies || {};
       if (!refreshToken) {
@@ -182,28 +193,27 @@ class AuthController {
       const decoded = jwt.verify(refreshToken, refreshSecretKey) as JwtPayload;
       const userId = decoded._id;
 
+      res.clearCookie("refreshToken");
+      res.clearCookie("isLoggedIn");
+      
       const isTokenExist = await AuthTokenHelper.isTokenExist(
         userId,
         refreshToken
       );
-
+      
       if (!isTokenExist) {
-        return res.status(401).json({ error: "Refesh token is invalid" });
+        return res.status(401).json({ error: "Refresh token is invalid" });
       }
-
-      res.clearCookie("refreshToken");
-      res.clearCookie("isLoggedIn");
 
       await AuthTokenHelper.revokeToken(userId, refreshToken);
 
       res.status(200).json({
-        status: "200",
         message: "Logout successfully",
       });
     } catch (err: any) {
       res.status(500).json({ status: "error", message: err.message });
     }
-  }
+  };
 }
 
-module.exports = new AuthController();
+export { AuthController };

@@ -1,14 +1,28 @@
-require("dotenv").config();
+import { PrismaClient, Prisma } from "@prisma/client";
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  omit: {
+    user: {
+      password: true,
+      blockedBy: true,
 
-class User {
+      dayOfBirth: true,
+      phoneNumber: true,
+
+      roomsId: true,
+
+      createdAt: true,
+      updatedAt: true,
+    }
+  }
+});
+
+class UserModel {
   static fetchAll() {
     return prisma.user.findMany();
   }
 
-  static findById(id: Number) {
+  static findById(id: string) {
     return prisma.user.findUnique({
       where: {
         id: id,
@@ -16,7 +30,7 @@ class User {
     });
   }
   
-  static findByUsername(username: String) {
+  static findByUsername(username: string) {
     return prisma.user.findUnique({
       where: {
         username: username,
@@ -24,7 +38,18 @@ class User {
     });
   }
 
-  static findByEmail(email: String) {
+  static findByUsernameWithPassword(username: string) {
+    return prisma.user.findUnique({
+      omit: {
+        password: false,
+      },
+      where: {
+        username: username,
+      },
+    });
+  }
+
+  static findByEmail(email: string) {
     return prisma.user.findUnique({
       where: {
         email: email,
@@ -32,11 +57,11 @@ class User {
     });
   }
 
-  static createUser(user: Object) {
+  static createUser(user: Prisma.userCreateInput) {
     return prisma.user.create({
       data: user,
     });
   }
 }
 
-module.exports = User;
+export { UserModel };
