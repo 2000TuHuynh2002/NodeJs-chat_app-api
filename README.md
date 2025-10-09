@@ -1,9 +1,8 @@
 ## Note
-
 MongoDB need to turn on replication to use "write" function of Prisma (maybe it will be your painful set up :DDD)
 
-## Introduction
 
+## Introduction
 Today project is chat application API with JWT authentication. This project use Typescript programming languague and ExpressJS web application framework.
 
 <p align="center">
@@ -12,15 +11,15 @@ Today project is chat application API with JWT authentication. This project use 
   </a>
 </p>
 
-## Features
 
+## Features
 - Chat application API
 - MongoDB
 - Redis
 - JWT authentication
 
-## Usage
 
+## Usage
 1.  Install node_modules packages:
 
     ```bash
@@ -72,8 +71,8 @@ Today project is chat application API with JWT authentication. This project use 
     curl ${host}:3000/api/up
     ```
 
-## Available routes
 
+## Available routes
 <div align="center">
   <table>
     <thead>
@@ -173,6 +172,6 @@ Today project is chat application API with JWT authentication. This project use 
   </table>
 </div>
 
-## Contributing
 
+## Contributing
 If you would like to contribute to this project, feel free to fork the repository and submit a pull request. Any contributions are welcome!
